@@ -1,0 +1,51 @@
+{
+  "name": "@accountdesk/translator",
+  "version": "0.0.0",
+  "description": "MDN Translator API polyfill: native window.Translator with on-device WASM fallback (Helsinki-NLP / Transformers.js).",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./bundle": {
+      "types": "./dist/bundle.d.ts",
+      "import": "./dist/bundle.js"
+    },
+    "./worker": {
+      "types": "./dist/worker.d.ts",
+      "import": "./dist/worker.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  },
+  "scripts": {
+    "build": "vp pack && node scripts/postbuild.mjs",
+    "dev": "vp pack --watch",
+    "test": "vp test --project unit",
+    "test:browser": "pnpm run build && vp test --project browser",
+    "test:all": "pnpm run test && pnpm run test:browser",
+    "check": "vp check",
+    "playground": "pnpm run build && pnpm --filter @accountdesk/translator-playground dev",
+    "prepublishOnly": "pnpm run test:all",
+    "prepare": "vp config"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^4.0.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^25.5.0",
+    "@typescript/native-preview": "7.0.0-dev.20260328.1",
+    "bumpp": "^11.0.1",
+    "typescript": "^6.0.2",
+    "vite-plus": "^0.1.14"
+  },
+  "packageManager": "pnpm@11.0.8"
+}

@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@accountdesk/translator playground</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+        --border: color-mix(in srgb, currentColor 20%, transparent);
+      }
+      body {
+        max-width: 720px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+        line-height: 1.4;
+      }
+      h1 {
+        margin-top: 0;
+      }
+      fieldset {
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 0.75rem 1rem;
+        margin-bottom: 1rem;
+      }
+      label {
+        display: inline-block;
+        margin-right: 1rem;
+      }
+      textarea {
+        width: 100%;
+        min-height: 4rem;
+        font-family: inherit;
+        font-size: inherit;
+        box-sizing: border-box;
+      }
+      button {
+        padding: 0.4rem 0.9rem;
+        margin-right: 0.5rem;
+      }
+      progress {
+        width: 100%;
+      }
+      pre {
+        background: color-mix(in srgb, currentColor 8%, transparent);
+        padding: 0.5rem 0.75rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        max-height: 12rem;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      .row {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .pill {
+        padding: 0.1rem 0.5rem;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        font-size: 0.85rem;
+      }
+      .ok {
+        color: #2a7a2a;
+      }
+      .warn {
+        color: #b87b00;
+      }
+      .err {
+        color: #b03030;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>@accountdesk/translator playground</h1>
+
+    <fieldset>
+      <legend>Variant</legend>
+      <label>
+        <input type="radio" name="variant" value="lean" checked />
+        Lean (default — Vite emits worker.js as a chunk)
+      </label>
+      <label>
+        <input type="radio" name="variant" value="bundle" />
+        Bundle (worker inlined as base64)
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Language pair</legend>
+      <div class="row">
+        <label
+          >From
+          <select id="src"></select
+        ></label>
+        <label
+          >To
+          <select id="tgt"></select
+        ></label>
+        <button id="btn-status">Check status</button>
+        <span id="status-pill" class="pill">—</span>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Lifecycle</legend>
+      <div class="row">
+        <button id="btn-create">Create</button>
+        <button id="btn-destroy" disabled>Destroy</button>
+        <span id="lifecycle-pill" class="pill">idle</span>
+      </div>
+      <div class="row" style="margin-top: 0.5rem">
+        <progress id="progress" value="0" max="1" hidden></progress>
+        <span id="progress-text"></span>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Translate</legend>
+      <textarea id="input" placeholder="Type something to translate…">
+Hello world. How are you today? I hope you are well.</textarea
+      >
+      <div class="row" style="margin: 0.5rem 0">
+        <button id="btn-translate" disabled>translate()</button>
+        <button id="btn-stream" disabled>translateStreaming()</button>
+        <button id="btn-measure" disabled>measureInputUsage()</button>
+        <button id="btn-abort" disabled>Abort</button>
+      </div>
+      <textarea id="output" readonly placeholder="Translation will appear here…"></textarea>
+    </fieldset>
+
+    <fieldset>
+      <legend>Log</legend>
+      <pre id="log"></pre>
+    </fieldset>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
