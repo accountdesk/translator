@@ -115,17 +115,16 @@ export async function loadInstance(
   return new WasmBackendInstance(client, sourceLanguage, targetLanguage);
 }
 
-function pickFactory(opts: TranslatorCreateOptions): WorkerFactory {
-  const factory = opts.worker ?? defaultWorkerFactory;
-  if (!factory) {
+function pickFactory(): WorkerFactory {
+  if (!defaultWorkerFactory) {
     throw translatorError(
       "NotSupportedError",
-      "No worker factory configured. Import from '@accountdesk/translator' (with " +
-        "static-URL worker) or '@accountdesk/translator/bundle' (with inlined " +
-        "worker), or pass `worker` to Translator.create().",
+      "No worker factory configured. Import from '@accountdesk/translator' (lean, " +
+        "static-URL worker) or '@accountdesk/translator/bundle' (worker inlined " +
+        "as base64) — both wire this up automatically.",
     );
   }
-  return factory;
+  return defaultWorkerFactory;
 }
 
 export const WasmBackend: Backend = {
@@ -142,7 +141,7 @@ export const WasmBackend: Backend = {
   async create(opts: TranslatorCreateOptions): Promise<BackendInstance> {
     const src = normalizeBaseTag(opts.sourceLanguage);
     const tgt = normalizeBaseTag(opts.targetLanguage);
-    const factory = pickFactory(opts);
+    const factory = pickFactory();
     const monitor: CreateMonitorImpl | undefined = opts.monitor
       ? buildMonitor(opts.monitor)
       : undefined;

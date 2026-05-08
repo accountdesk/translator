@@ -38,32 +38,25 @@ import { Translator } from "@accountdesk/translator";
 
 ### `@accountdesk/translator/bundle` (all-in-one — ~150 KB gzipped, lazy-friendly)
 
-Carries the worker as a base64-encoded string inside the main module and spawns it from a `Blob`-URL at runtime. No `new URL(...)` magic — works in any bundler without configuration.
+Carries the worker as a base64-encoded string inside the main module and spawns it from a `Blob`-URL at runtime. No `new URL(...)` magic — works in any bundler without configuration. Useful when:
+
+- your bundler doesn't recognize `new Worker(new URL(..., import.meta.url))` (rare but it happens — older Webpack configs, custom build setups);
+- you want a single self-contained file (e.g. for a `<script type="module">` deployment);
+- you want to lazy-load the entire WASM stack only on browsers that lack the native API.
 
 ```ts
-// Pay nothing on the native code path; load the WASM fallback only when needed.
-const status = await (await import("@accountdesk/translator")).Translator.availability(opts);
-if (status === "unavailable") {
-  const { Translator } = await import("@accountdesk/translator/bundle");
-  // ...
-}
+// Probe the native API directly — no library code is loaded yet. Then pick
+// the variant that fits, and dynamic import() splits it into its own chunk.
+const hasNative = "Translator" in globalThis;
+
+const { Translator } = hasNative
+  ? await import("@accountdesk/translator") // Native path: tiny module, no worker fetched
+  : await import("@accountdesk/translator/bundle"); // WASM fallback with everything inlined
+
+const t = await Translator.create({ sourceLanguage: "en", targetLanguage: "de" });
 ```
 
-The `bundle` entry is best paired with a dynamic `import()` so users on Chromium (where the native API is available) never download it.
-
-### Bring your own worker
-
-Both entries accept an optional `worker` factory in `Translator.create`. Useful for shared workers, pre-warmed pools, or fully custom worker URLs:
-
-```ts
-import myWorkerUrl from "./my-worker.js?worker&url";
-
-const translator = await Translator.create({
-  sourceLanguage: "en",
-  targetLanguage: "de",
-  worker: () => new Worker(myWorkerUrl, { type: "module" }),
-});
-```
+On Chromium (native available) only the lean module is fetched — a couple of KB. On Firefox / Safari the bundle module is fetched once and runs the WASM pipeline from its inlined worker. Neither path costs anything until the user actually triggers a translation.
 
 ## API
 
@@ -82,7 +75,6 @@ class Translator {
     targetLanguage: string;
     monitor?: (m: CreateMonitor) => void;
     signal?: AbortSignal;
-    worker?: () => Worker; // optional override (WASM path only)
   }): Promise<Translator>;
 
   readonly inputQuota: number;

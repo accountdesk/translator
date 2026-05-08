@@ -8,12 +8,6 @@ export interface TranslatorOptions {
 export interface TranslatorCreateOptions extends TranslatorOptions {
   monitor?: CreateMonitorCallback;
   signal?: AbortSignal;
-  /**
-   * Override the WASM worker factory for this call. Useful when consumers want
-   * a long-lived shared worker, a pre-warmed pool, or a custom worker URL.
-   * Ignored on the native code path.
-   */
-  worker?: () => Worker;
 }
 
 export type CreateMonitorCallback = (monitor: CreateMonitor) => void;
